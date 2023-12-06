@@ -3,23 +3,34 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import ToDo from "../components/ToDo";
+import { useQuery } from '@tanstack/react-query';
 
 
 
 export default function Details () {
     const { userId } = useParams();
-    const [todos, setTodos] = useState([]);
-    useEffect(() => {
-     axios.get("https://jsonplaceholder.typicode.com/todos")
-    .then((response)=>{
-        setTodos(response.data);
-  })}, [userId]);
+  function getData () {
+    const request = axios.get("https://jsonplaceholder.typicode.com/todos")
+    return request;
+}
+
+const {data, isLoading, isFetching, isError, error} = useQuery({queryKey:['repoData2'], queryFn: getData })
+
+   if (isLoading) {
+    return(
+        <h1>Loading...</h1>
+    )
+   }
+   if (isError) {
+    console.log('error mes', error);
+   }
+   console.log(data);
 
     return (
         <div>
 
 <Navbar/>
-{todos.map((todo) => {
+{data?.data.map((todo) => {
   if (todo.userId == userId) {
     return (
       <>

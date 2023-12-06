@@ -1,24 +1,33 @@
 import Navbar from "../components/Navbar";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
 import UserCard from "../components/UserCard";
-
+import { useQuery } from '@tanstack/react-query';
 
 
 export default function Home () {
-        const [users, setUsers] = useState([]);
-        useEffect(() => {
-  axios.get("https://jsonplaceholder.typicode.com/users")
-  .then((response) => {
-    setUsers(response.data);})
-}, []); 
 
-        
+function getData () {
+    const request = axios.get("https://jsonplaceholder.typicode.com/users")
+    return request;
+}
+
+const {data, isLoading, isFetching, isError, error} = useQuery({queryKey:['repoData'], queryFn: getData })
+
+   if (isLoading) {
+    return(
+        <h1>Loading...</h1>
+    )
+   }
+   if (isError) {
+    console.log('error mes', error);
+   }
+   console.log(data);
+
     return (
         <>
         <Navbar/>
        <div className="cards">
-       {users.map((user) => (
+       {data?.data.map((user) => (
         <UserCard
           key={user.id}
           link={user.id}
